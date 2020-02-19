@@ -44,7 +44,7 @@ _ISR__(INT2_vect){
 					
 				
 					Timer_GetValue(ICU_TIMER_CH0, &gu16_no_of_counts);
-					Timer_GetValue(ICU_TIMER_CH0, &gu32_no_of_ovf);
+					Timer_GetNoOfOVFS(ICU_TIMER_CH0, &gu32_no_of_ovf);
 					
 				
 				}
@@ -85,8 +85,8 @@ ERROR_STATUS Icu_Init(Icu_cfg_s * Icu_Cfg){
 		return E_NOK;
 	}
 	else{
-		DIO_Cfg_s dio_Cfg;
-		Timer_cfg_s timer_cfg;
+		DIO_Cfg_s astr_dio_Cfg;
+		Timer_cfg_s astr_timer_cfg;
 		switch(Icu_Cfg->ICU_Ch_No){
 			//DEI channel 0
 			case ICU_CH0:
@@ -100,21 +100,21 @@ ERROR_STATUS Icu_Init(Icu_cfg_s * Icu_Cfg){
 			case ICU_CH2:
 			
 			
-			dio_Cfg.GPIO =DEI_ICU_PORT;
-			dio_Cfg.dir =INPUT;
-			dio_Cfg.pins=DEI_ICU_PIN;
+			astr_dio_Cfg.GPIO =DEI_ICU_PORT;
+			astr_dio_Cfg.dir =INPUT;
+			astr_dio_Cfg.pins=DEI_ICU_PIN;
 			
-			DIO_init(&dio_Cfg);
+			DIO_init(&astr_dio_Cfg);
 		    
 			switch(Icu_Cfg->ICU_Ch_Timer){
 				//Timer channel 0
 				case ICU_TIMER_CH0:
 				
-				timer_cfg.Timer_CH_NO = ICU_TIMER_CH0;
-				timer_cfg.Timer_Mode =TIMER_MODE;
-				timer_cfg.Timer_Polling_Or_Interrupt =TIMER_POLLING_MODE;
-				timer_cfg.Timer_Prescaler= ICU_Prescale_No
-				Timer_Init(&timer_cfg);
+				astr_timer_cfg.Timer_CH_NO = ICU_TIMER_CH0;
+				astr_timer_cfg.Timer_Mode =TIMER_MODE;
+				astr_timer_cfg.Timer_Polling_Or_Interrupt =TIMER_POLLING_MODE;
+				astr_timer_cfg.Timer_Prescaler= ICU_Prescale_No
+				Timer_Init(&astr_timer_cfg);
 				
 				gu8_ICU_TimeCH = ICU_TIMER_CH0;
 				
@@ -166,7 +166,7 @@ ERROR_STATUS Icu_Init(Icu_cfg_s * Icu_Cfg){
  ***************************************************************************/
 ERROR_STATUS Icu_ReadTime(uint8_t Icu_Channel, uint8_t Icu_EdgeToEdge, uint32_t * Icu_Time){
 	
-	float tickTimeInMicros;
+	float af_tickTimeInMicros;
 	switch(Icu_Channel){
 		
 		//TIMER channel 0
@@ -190,9 +190,9 @@ ERROR_STATUS Icu_ReadTime(uint8_t Icu_Channel, uint8_t Icu_EdgeToEdge, uint32_t 
 			
 			while(gu8_no_of_ISR_Entrance != TRUE);
 			gu8_no_of_ISR_Entrance=FALSE;
-			tickTimeInMicros =(ICU_Prescale/FCPU_HZ);
+			af_tickTimeInMicros =(ICU_Prescale/FCPU_HZ);
 			//(*Icu_Time) =  (gu16_no_of_counts*tickTimeInMicros)+(gu32_no_of_ovf*_8BIT_RESOLUTION_*tickTimeInMicros);
-			(*Icu_Time) =  (gu16_no_of_counts*tickTimeInMicros);
+			(*Icu_Time) =  (gu16_no_of_counts*af_tickTimeInMicros);
 			
 			break;
 			

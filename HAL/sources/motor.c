@@ -19,68 +19,68 @@
  * Description	: Initialize (Enable, IN1, IN2) pins as digital outputs.
  */
 ERROR_STATUS Motor_Init(uint8_t Motor_Number){
-	DIO_Cfg_s dioCfg;
-	Pwm_Cfg_s pwmCfg;
+	DIO_Cfg_s astr_dioCfg;
+	Pwm_Cfg_s astr_pwmCfg;
 	switch(Motor_Number){
 		case MOTOR_1:
 			
 			//Set the direction of the motor enable to output
-			dioCfg.GPIO=MOTOR1_EN_PORT;
-			dioCfg.pins=MOTOR1_EN_PIN;
-			dioCfg.dir=OUTPUT;
+			astr_dioCfg.GPIO=MOTOR1_EN_PORT;
+			astr_dioCfg.pins=MOTOR1_EN_PIN;
+			astr_dioCfg.dir=OUTPUT;
 			
-			DIO_init(&dioCfg);
+			DIO_init(&astr_dioCfg);
 			
 			//Set the direction of the motor directions to output
 			
-			dioCfg.GPIO=MOTOR_OUT_1A_GPIO;
-			dioCfg.pins=MOTOR_OUT_1A_BIT;
-			dioCfg.dir=OUTPUT;
+			astr_dioCfg.GPIO=MOTOR_OUT_1A_GPIO;
+			astr_dioCfg.pins=MOTOR_OUT_1A_BIT;
+			astr_dioCfg.dir=OUTPUT;
 			
-			DIO_init(&dioCfg);
+			DIO_init(&astr_dioCfg);
 			
-			dioCfg.GPIO=MOTOR_OUT_1B_GPIO;
-			dioCfg.pins=MOTOR_OUT_1B_BIT;
-			dioCfg.dir=OUTPUT;
+			astr_dioCfg.GPIO=MOTOR_OUT_1B_GPIO;
+			astr_dioCfg.pins=MOTOR_OUT_1B_BIT;
+			astr_dioCfg.dir=OUTPUT;
 			
-			DIO_init(&dioCfg);
+			DIO_init(&astr_dioCfg);
 			
 			// initializing the pwm
 			
-			pwmCfg.Channel = PWM_CH1A;
-			pwmCfg.Prescaler =PWM_PRESCALER_1024;
-			Pwm_Init(&pwmCfg);
+			astr_pwmCfg.Channel = PWM_CH1A;
+			astr_pwmCfg.Prescaler =PWM_PRESCALER_1024;
+			Pwm_Init(&astr_pwmCfg);
 			
 			
 		break;
 		
 		case MOTOR_2:
 			//Set the direction of the motor enable to output
-			dioCfg.GPIO=MOTOR2_EN_PORT;
-			dioCfg.pins=MOTOR2_EN_PIN;
-			dioCfg.dir=OUTPUT;
+			astr_dioCfg.GPIO=MOTOR2_EN_PORT;
+			astr_dioCfg.pins=MOTOR2_EN_PIN;
+			astr_dioCfg.dir=OUTPUT;
 			
-			DIO_init(&dioCfg);
+			DIO_init(&astr_dioCfg);
 			
 			//Set the direction of the motor directions to output
 			
-			dioCfg.GPIO=MOTOR_OUT_2A_GPIO;
-			dioCfg.pins=MOTOR_OUT_2A_BIT;
-			dioCfg.dir=OUTPUT;
+			astr_dioCfg.GPIO=MOTOR_OUT_2A_GPIO;
+			astr_dioCfg.pins=MOTOR_OUT_2A_BIT;
+			astr_dioCfg.dir=OUTPUT;
 			
-			DIO_init(&dioCfg);
+			DIO_init(&astr_dioCfg);
 			
-			dioCfg.GPIO=MOTOR_OUT_2B_GPIO;
-			dioCfg.pins=MOTOR_OUT_2B_BIT;
-			dioCfg.dir=OUTPUT;
+			astr_dioCfg.GPIO=MOTOR_OUT_2B_GPIO;
+			astr_dioCfg.pins=MOTOR_OUT_2B_BIT;
+			astr_dioCfg.dir=OUTPUT;
 			
-			DIO_init(&dioCfg);
+			DIO_init(&astr_dioCfg);
 			
 			// initializing the pwm
 			
-			pwmCfg.Channel = PWM_CH1B;
-			pwmCfg.Prescaler =PWM_PRESCALER_1024;
-			Pwm_Init(&pwmCfg);
+			astr_pwmCfg.Channel = PWM_CH1B;
+			astr_pwmCfg.Prescaler =PWM_PRESCALER_1024;
+			Pwm_Init(&astr_pwmCfg);
 			
 		break;
 		

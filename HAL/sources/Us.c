@@ -23,20 +23,20 @@
 
 
 ERROR_STATUS Us_Init(void){
-	Icu_cfg_s icuCfg;
-	DIO_Cfg_s dioCfg;
+	Icu_cfg_s astr_icuCfg;
+	DIO_Cfg_s astr_dioCfg;
 	
-	icuCfg.ICU_Ch_Timer = ICU_TIMER_CH0;
-	icuCfg.ICU_Ch_No =ICU_CH2;
-	if(Icu_Init(&icuCfg) == E_NOK){
+	astr_icuCfg.ICU_Ch_Timer = ICU_TIMER_CH0;
+	astr_icuCfg.ICU_Ch_No =ICU_CH2;
+	if(Icu_Init(&astr_icuCfg) == E_NOK){
 		return E_NOK;
 	}
 	else{
-		dioCfg.GPIO =TRIGGER_PORT;
-		dioCfg.pins =TRIGGER_PIN;
-		dioCfg.dir  =OUTPUT;
+		astr_dioCfg.GPIO =TRIGGER_PORT;
+		astr_dioCfg.pins =TRIGGER_PIN;
+		astr_dioCfg.dir  =OUTPUT;
 		
-		DIO_init(&dioCfg);
+		DIO_init(&astr_dioCfg);
 		
 		
 		return E_OK;
@@ -59,17 +59,14 @@ ERROR_STATUS Us_Init(void){
 
 
 ERROR_STATUS Us_Trigger(void){
-	DIO_Write(TRIGGER_PORT,TRIGGER_PIN,HIGH);
-	delayMsTimer(1);
-	DIO_Write(TRIGGER_PORT,TRIGGER_PIN,LOW);
 	
-	/*if(DIO_Write(TRIGGER_PORT,TRIGGER_PIN,HIGH) == E_NOK)
+	if(DIO_Write(TRIGGER_PORT,TRIGGER_PIN,HIGH) == E_NOK)
 		return E_NOK;
 
 	delayMsTimer(1);
 	
 	if(DIO_Write(TRIGGER_PORT,TRIGGER_PIN,LOW) == E_NOK)
-		return E_NOK;*/
+		return E_NOK;
 		
 		
 	return E_OK;
@@ -92,10 +89,10 @@ ERROR_STATUS Us_Trigger(void){
 
 ERROR_STATUS Us_GetDistance(uint16_t *Distance){
 	if(Distance != NULL){
-		uint32_t timeInMicros;
-		if(Icu_ReadTime(ICU_TIMER_CH0,ICU_RISE_TO_FALL,&timeInMicros) == E_OK){
+		uint32_t au32_timeInMicros;
+		if(Icu_ReadTime(ICU_TIMER_CH0,ICU_RISE_TO_FALL,&au32_timeInMicros) == E_OK){
 			
-			(*Distance) = timeInMicros / 58;
+			(*Distance) = au32_timeInMicros / 58;
 			
 			
 			return E_OK;

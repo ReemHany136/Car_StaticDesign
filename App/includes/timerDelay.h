@@ -14,9 +14,9 @@
 /*				 DEFINES			        */
 /************************************************************************/
 
-#define delayChannel   TIMER_CH2
+#define DELAY_CHANNEL   TIMER_CH2
 #define delayPrescale  TIMER_PRESCALER_64
-#define delayCounts    250
+#define DELAY_COUNTS    250
 
 /************************************************************************/
 /*				 PROTOTYPES			        */
@@ -28,6 +28,12 @@
 *Description: delay time in millis 
 */
 extern void delayMsTimer(uint32_t delayMs);
+
+/*
+*Input: delay time in millis
+*Output: No output
+*Description: delay time in millis
+*/
 extern void softwareDelayMs_(uint32_t delayTime);
 
 #endif /* TIMERDELAY_H_ */

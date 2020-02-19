@@ -16,11 +16,11 @@
  */
 
 ERROR_STATUS Steering_Init(void){
-	ERROR_STATUS status;
+	ERROR_STATUS a_ERROR_status;
 	
-	status= Motor_Init(MOTOR_1);
-	status= Motor_Init(MOTOR_2);
-	return status;
+	a_ERROR_status= Motor_Init(MOTOR_1);
+	a_ERROR_status= Motor_Init(MOTOR_2);
+	return a_ERROR_status;
 }
 
 /**

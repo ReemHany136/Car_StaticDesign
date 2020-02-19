@@ -16,21 +16,21 @@
 int main(void)
 {
 	
-	DIO_Cfg_s dioCfg;
+	DIO_Cfg_s astr_dioCfg;
 	
 
-	dioCfg.GPIO = GPIOB;
-	dioCfg.pins = BIT4|BIT5|BIT6|BIT7;
-	dioCfg.dir =OUTPUT;
+	astr_dioCfg.GPIO = GPIOB;
+	astr_dioCfg.pins = BIT4|BIT5|BIT6|BIT7;
+	astr_dioCfg.dir  = OUTPUT;
 	
-	DIO_init(&dioCfg);
+	DIO_init(&astr_dioCfg);
 	
-//	Steering_Init();
+
 	Car_SM_Init();
 	
   while(1)
     {
-		//Steering_SteerCar(CAR_STOP,30);
+		
 		Car_SM_Update();
 		
 		

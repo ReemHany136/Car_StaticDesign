@@ -136,8 +136,7 @@ ERROR_STATUS DIO_Write (uint8_t GPIO, uint8_t pins, uint8_t value){
 		else{
 			return E_NOK;
 		}
-		/*clr_bit_mask(PORTB_DATA,pins);
-		PORTB_DATA |= (value & pins);*/
+		
 		break;
 		
 		case GPIOC:
@@ -150,8 +149,7 @@ ERROR_STATUS DIO_Write (uint8_t GPIO, uint8_t pins, uint8_t value){
 		else{
 			return E_NOK;
 		}
-		/*clr_bit_mask(PORTC_DATA,pins);
-		PORTC_DATA |= (value & pins);*/
+		
 		break;
 		
 		case GPIOD:
@@ -164,8 +162,7 @@ ERROR_STATUS DIO_Write (uint8_t GPIO, uint8_t pins, uint8_t value){
 		else{
 			return E_NOK;
 		}
-		/*clr_bit_mask(PORTD_DATA,pins);
-		PORTD_DATA |= (value & pins);*/
+		
 		break;
 		
 		default:
