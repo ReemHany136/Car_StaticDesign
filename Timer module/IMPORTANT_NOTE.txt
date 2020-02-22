@@ -1,0 +1,4 @@
+NOTES:
+
+>> Make sure to replace [#include "registers.h"] to [#include "Mock_registers.h"] 
+>> Make sure to add  your std_types file, common_mackros file, interrupts.h if you use the in your Timer Module 
