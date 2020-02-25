@@ -16,7 +16,10 @@ static uint8_t gu8_InitFlag=FALSE,
 			   gu8_ISR_Flag=FALSE;
 			   
 
+/**********Static Prototypes************/
 
+static void TMU_RemoveTask(uint16_t TaskID);
+static void TMU_CheckFlag(void);
 
 /*******Function Implementation*********/
 
@@ -323,7 +326,6 @@ ERROR_STATUS TMU_Start_Timer(TMU_TASK_Cfg* task){
  */
 ERROR_STATUS TMU_Stop_Timer(uint8_t taskID){
 	/*Define Locals*/
-	uint16_t au16_TaskIterator;
 	ERROR_STATUS aES_errorStatus;
 	
 	/*Check whether the module is initialized or not*/
@@ -341,15 +343,9 @@ ERROR_STATUS TMU_Stop_Timer(uint8_t taskID){
 			//ERROR assignment
 			aES_errorStatus = E_OK;
 			
-			/*LOOP on the whole buffer to remove the task with the given task_id */
-			for (au16_TaskIterator =0; au16_TaskIterator < TMU_TASK_BUFFER_SIZE; au16_TaskIterator++)
-			{
-				if (gstr_TasksBuffer[au16_TaskIterator]->Task_id == taskID)
-				{
-					gstr_TasksBuffer[au16_TaskIterator] = NULL;
-					break;
-				}
-			}
+			/*Remove the task with the given task_id */
+			TMU_RemoveTask(taskID);
+			
 		}
 		else{
 			//ERROR assignment
@@ -367,8 +363,7 @@ ERROR_STATUS TMU_Stop_Timer(uint8_t taskID){
 }
 
 /**
- * Input: 
- * 	taskID: the id of a specific task.
+ * Input:
  * Output:
  * In/Out:			
  * Return: 			
@@ -404,10 +399,35 @@ void TMU_Dispatcher(void){
 					}
 					//In case the task is one shot function remove the task
 					else{
-						gstr_TasksBuffer[au16_TaskIterator] = NULL;
+						gstr_TasksBuffer[au16_TaskIterator]= NULL;
 					}
 				}
 			}
 		}
 	}
 }
+
+/**
+ * Input: 
+ * 	taskID: the id of a specific task.
+ * Output:
+ * In/Out:			
+ * Return: 			
+ * Description: This function Removes the task with the given id from the buffer
+ * 							
+ */
+static void TMU_RemoveTask(uint16_t TaskID){
+	//Define Locals
+	uint16_t au16_TaskIterator;
+	
+	for (au16_TaskIterator =0; au16_TaskIterator < TMU_TASK_BUFFER_SIZE; au16_TaskIterator++)
+	{
+		if (gstr_TasksBuffer[au16_TaskIterator]->Task_id == TaskID)
+		{
+			gstr_TasksBuffer[au16_TaskIterator] = NULL;
+			break;
+		}
+	}
+	
+}
+

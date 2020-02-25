@@ -78,7 +78,8 @@ extern ERROR_STATUS TMU_DeInit(void);
  * Output:
  * In/Out:			
  * Return: The error status of the function.			
- * Description: This function act as the TMU creator as it starts the initialized timer , creates the task and save it in the TMU task buffer.
+ * Description: This function act as the TMU creator as it starts the initialized timer , 
+ *              creates the task and save it in the TMU task buffer.
  * 							
  */
 extern ERROR_STATUS TMU_Start_Timer(TMU_TASK_Cfg* task);
