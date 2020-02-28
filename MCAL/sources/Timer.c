@@ -6,12 +6,24 @@
  */ 
 #include "Timer.h"
 #include "Timer_Cfg.h"
+#include "DIO.h"
 
 /**************************Global variables*****************************/
 static volatile uint32_t gu32_NoOfOvfs0;
+static volatile void (*CTC2_CallBack_Fun)(void) = NULL;
+
+/**************************ISRs*****************************/
 _ISR__(TIMER0_OVF_vect){
 	gu32_NoOfOvfs0++;
 }
+
+_ISR__(TIMER2_COMP_vect){
+	
+	if(CTC2_CallBack_Fun != NULL){
+		CTC2_CallBack_Fun();
+	}
+}
+
 
 static uint8_t gu8_T0PrescaleMask,gu8_T1PrescaleMask,gu8_T2PrescaleMask;
 /**
@@ -123,6 +135,10 @@ ERROR_STATUS Timer_Init(Timer_cfg_s* Timer_cfg){
 			/*Timer 2 configurations*/
 			case TIMER_CH2:
 			TCCR2 |= T2_WGMODE_MASK | T2_OC2_MASK;
+			
+			#if TIMER2_CTC_WMODE == ENABLE
+				CTC2_CallBack_Fun = Timer_cfg->Timer_Cbk_ptr;
+			#endif
 			
 			//Configure the prescale
 			switch(Timer_cfg->Timer_Prescaler){
