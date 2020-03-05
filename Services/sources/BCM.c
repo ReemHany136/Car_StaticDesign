@@ -7,9 +7,10 @@
 
 #include "BCM.h"
 
-/***************/
-/***** LOCAL MACROS *****/
-/***************/
+
+/*************************************************************/
+/*********************** LOCAL MACROS ***********************/
+/***********************************************************/
 
 #define NOT_INITIALIZED 0
 #define INITIALIZED 0xFF
@@ -34,27 +35,6 @@
 #define SEND_BYTE_COMPLETE 3
 #define FRAME_COMPLETE 4
 
-/***************/
-/***** LOCAL STRUCT *****/
-/***************/
-
-
-
-
-/*****************/
-/***** GLOBAL VARIABLES *****/
-/***************/
-
-static uint8_t gu8_Protocol = NOT_INITIALIZED;
-static void (*ptrSend) (uint8_t,uint8_t*) = NULL;
-/* strTxBuffer_t gstrTxBuffer;*/
-static uint8_t gu8_TxCreatorFlag = NOT_INITIALIZED;
-static uint8_t gu8_TxCheckSum = TX_CHECK_SUM_INITIAL_VALUE;
-
-static uint8_t gu8_TxByteSendFlag = NOT_INITIALIZED;
-strTxBuffer_t Tx_RequestBuffer [NUMBER_OF_REQUEST_FOR_TX_BCM];
-
-/*Local defines*/
 #define BCM_ID                    'A'
 #define RX_BCMID_BYTE_NUM          0
 #define RX_SIZE_LSB_BYTE_NUM       1
@@ -63,26 +43,46 @@ strTxBuffer_t Tx_RequestBuffer [NUMBER_OF_REQUEST_FOR_TX_BCM];
 
 #define RX_BUFFER_REMAINING_SIZE   3
 
+/*************************************************************/
+/*********************** LOCAL STRUCT ***********************/
+/***********************************************************/
+
+
+
+
+/*************************************************************/
+/********************* GLOBAL VARIABLES *********************/
+/***********************************************************/
+strTxBuffer_t Tx_RequestBuffer [NUMBER_OF_REQUEST_FOR_TX_BCM];
+static strBufferInfo_t gstr_RxBuffer;
 static strRecievedInfo_t  gstr_RxInfo;
 
-static uint8_t gu8_Protocol , gu8_CurrentState , gu8_Direction,
-			   gu8_FrameRecieveFlag , gu8_RXBufferStateLock ,
-			   gu8_SizeErrorFlag ;
-			   
+static void (*ptrSend) (uint8_t,uint8_t*) = NULL;
+static void (*RxBCM_CBK)(uint8_t) = NULL;
+
+static uint8_t gu8_Protocol , gu8_CurrentState , gu8_TxByteSendFlag, gu8_Protocol,
+			      gu8_FrameRecieveFlag , gu8_RXBufferStateLock , gu8_Direction,
+			      gu8_SizeErrorFlag , gu8_TxCreatorFlag , gu8_TxCheckSum;
+
 static uint16_t gu16_CurrentFrameCounter , gu16_SizeMSB, gu16_SizeLSB;
 
-static strBufferInfo_t gstr_RxBuffer;
-
-static void (*RxBCM_CBK)(uint8_t);
-
-/*Static Prototypes*/
+int x=0;
+/*************************************************************/
+/***************** LOCAL FUNCTION PROTOTYPE *****************/
+/***********************************************************/
 void BCM_ISR_CBK(uint8_t RecievedByte);
 
-/*Function implementation*/
+/*************************************************************/
+/*************** LOCAL FUNCTION IMPLEMENTAION ***************/
+/***********************************************************/
 
 void BCM_ISR_CBK(uint8_t RecievedByte){
 	
-	if ((gstr_RxInfo.RxCounter== RX_BCMID_BYTE_NUM) && (RecievedByte == BCM_ID) && (gu8_RXBufferStateLock == RX_UNLOCK))
+
+	
+	TCNT0 = RecievedByte;
+   
+	if ((gstr_RxInfo.RxCounter == RX_BCMID_BYTE_NUM) && (RecievedByte == BCM_ID) && (gu8_RXBufferStateLock == RX_UNLOCK))
 	{
 		gu8_FrameRecieveFlag = TRUE;
 		gu8_RXBufferStateLock = RX_RECIEVING;
@@ -91,6 +91,7 @@ void BCM_ISR_CBK(uint8_t RecievedByte){
 	}
 	
 	else if((gu8_RXBufferStateLock == RX_RECIEVING)){
+	
 		
 		if(gstr_RxInfo.RxCounter == RX_SIZE_LSB_BYTE_NUM){
 			gu16_SizeLSB = RecievedByte;
@@ -126,6 +127,10 @@ void BCM_ISR_CBK(uint8_t RecievedByte){
 	
 }
 
+
+/*************************************************************/
+/*************** APIS FUNCTION IMPLEMENTAION ****************/
+/***********************************************************/
 ERROR_STATUS BCM_Init(strBCMCfg_t *BCMCfg){
 	ERROR_STATUS ERR;
 	if (BCMCfg != NULL)
@@ -147,6 +152,7 @@ ERROR_STATUS BCM_Init(strBCMCfg_t *BCMCfg){
 			{
 				DIO_Write(GPIOA,BIT1,HIGH);
 				_SPIInitSlave(Fosc4 , mode1 ,MSB,SPI_INTERRUPT_MODE,BCM_ISR_CBK);
+				
 			}
 			ERR =E_OK;
 			break;
@@ -227,6 +233,7 @@ ERROR_STATUS BCM_Init(strBCMCfg_t *BCMCfg){
 	return ERR;
 }
 
+
 ERROR_STATUS BCM_SetupRxBuffer(uint8_t* PtrRxData,uint16_t size,void (*Notification)(uint8_t)){
 	ERROR_STATUS ERR;
 	if(PtrRxData != NULL && Notification != NULL){
@@ -241,6 +248,7 @@ ERROR_STATUS BCM_SetupRxBuffer(uint8_t* PtrRxData,uint16_t size,void (*Notificat
 	return ERR;
 	
 }
+
 
 ERROR_STATUS BCM_RxUnlock(uint8_t Rxlock){
 	ERROR_STATUS ERR;
@@ -265,12 +273,14 @@ void BCM_RxDispatcher(void){
 		if (gu8_RXBufferStateLock == RX_RECIEVING)
 		{
 			gu8_CurrentState = RX_RECIEVING_BYTE;
+			
 		}
 		
 		
 		break;
 		
 		case  RX_RECIEVING_BYTE:
+		
 		/*Loop on what is came from the ISR and make the check on this data*/
 		while(gu16_CurrentFrameCounter < gstr_RxInfo.RxCounter){
 			
@@ -365,15 +375,26 @@ ERROR_STATUS BCM_Send(strTxBuffer_t * TxRequest)
 	return au8_Error;
 }
 
+
 void BCM_TxDispatcher (void)
 {
+	/*
+	 *local variables
+	 */
 	static uint8_t au8_TxDisState = IDLE;
 	static uint8_t au8_TxFrameCompleteFlag = NOT_INITIALIZED;
 	static uint8_t au8_IdleCounter = IDLE_COUNTER_INITIAL_VALUE;
 	static uint16_t gu16_TxFrameCounter = TX_FRAME_COUNTER_INITAIL_VALUE;
 	
+
+	/*
+	 * Tx dispatcher state machine 
+	 */
 	switch (au8_TxDisState)
 	{
+		/*
+		 *the dis stay in this case till app call creator function, at this time it move the dis to next case sending byte 
+		 */
 		case IDLE:
 		//adjust the idle state according to the edit in sending due to array of request
 		/* check if app call the creator */
@@ -387,12 +408,13 @@ void BCM_TxDispatcher (void)
 				/* Change the Tx DIS state to Sending byte to start send the frame */
 				au8_TxDisState = SENDING_BYTE;
 
-				/* Save the requested id*/
-
+				/* update send frame counter */
 				gu16_TxFrameCounter++;
+
+				/* Save the requested id*/
 				break;
 			}
-			/* Do nothing */
+			/* Do nothing and stay in same case because app doesn't call the creator yet*/
 			else
 			;
 		}
@@ -400,26 +422,30 @@ void BCM_TxDispatcher (void)
 		break;
 
 		/*********************************************************************************************************************************/
+		/*
+		 *this case send the byte through desired protocol
+		 */
+		
 		case SENDING_BYTE:
 		/* check if it the ID byte (first byte in the frame) */
 		if (ID_BYTE == gu16_TxFrameCounter)
 		{
-			/* send the BCM ID byte */
-			ptrSend('A', &gu8_TxByteSendFlag);//change the sending data by BCM ID variable
+			/* send the BCM ID byte 'A'*/
+			ptrSend('A', &gu8_TxByteSendFlag);
 		}
 		
 		/* check if it the size first byte (second byte in the frame) */
 		else if ( SIZE_FIRST_BYTE == gu16_TxFrameCounter)
 		{
-			/* send the frame size first byte */
-			ptrSend(Tx_RequestBuffer[au8_IdleCounter].Size, &gu8_TxByteSendFlag);//change the sending data by first size variable
+			/* send the frame size first byte (low byte in the size)*/
+			ptrSend(Tx_RequestBuffer[au8_IdleCounter].Size, &gu8_TxByteSendFlag);
 		}
 
 		/* check if it the size second byte (third byte in the frame) */
 		else if ( SIZE_SECOND_BYTE == gu16_TxFrameCounter)
 		{
-			/* send the frame size second byte */
-			ptrSend(((Tx_RequestBuffer[au8_IdleCounter].Size)>>8), &gu8_TxByteSendFlag);//change the sending data by second size variable
+			/* send the frame size second byte (high byte in the size) */
+			ptrSend(((Tx_RequestBuffer[au8_IdleCounter].Size)>>8), &gu8_TxByteSendFlag);
 		}
 
 		/* check if it the data byte */
@@ -442,7 +468,11 @@ void BCM_TxDispatcher (void)
 		au8_TxDisState = SEND_BYTE_COMPLETE;
 		break;
 
-		/********************************************************************************************************************************/
+		/*************************************************************************************************************************************************************/
+		/*
+		 *Tx Dispatcher stay in this case till the protocol send the desired byte
+		 */
+		
 		case SEND_BYTE_COMPLETE:
 		
 		/* check if the current byte sent */
@@ -454,6 +484,7 @@ void BCM_TxDispatcher (void)
 				/* change the DIS state to frame complete*/
 				au8_TxDisState = FRAME_COMPLETE;
 			}
+			/* if the sent byte was not the last one send the next byte */
 			else
 			{
 				/* Increment the frame counter to send the next byte*/
@@ -469,13 +500,20 @@ void BCM_TxDispatcher (void)
 		}
 		break;
 		
-		/*****************************************/
+		/*******************************************************************************************************************************************************/
+		/*
+		 *this case reset the request and notify the app that the request send 
+		 */
+		
 		case FRAME_COMPLETE:
-		/* unlock Tx buffer to provide the app to use the buffer*/
+		/* retest the request to it's initial value to provide the app to use it */
 		Tx_RequestBuffer[au8_IdleCounter].Lock = TX_BUFFER_UNLOCK;
 		Tx_RequestBuffer[au8_IdleCounter].ptrTxBuffer = NULL;
 		Tx_RequestBuffer[au8_IdleCounter].Size = ZERO;
 		
+		/* return the tx frame counter to it's initial value to start from the begging in the next frame*/
+		gu16_TxFrameCounter = TX_FRAME_COUNTER_INITAIL_VALUE;
+
 		/* notify the app that buffer send complete*/
 		//still don't know how?? is it by call function or by set flag for the app i don't know till now
 		
@@ -490,10 +528,12 @@ void BCM_TxDispatcher (void)
 	}
 }
 
+
 ERROR_STATUS BCM_GetTxBuffer(strTxBuffer_t * TxRequestID,uint8_t * TxBufferState)
 {
 	uint8_t au8_Error = E_OK;
 	
+	/* return the state of the request */
 	*TxBufferState = TxRequestID->Lock;
 
 	return au8_Error;

@@ -9,11 +9,10 @@
 #ifndef UART_H_
 #define UART_H_
 
-#include "registers.h"
-#include "std_types.h"
+#include "../../HAL/registers.h"
+#include "../../SERVICE/std_types.h"
 #include "UART_Config.h"
-#include "interrupts.h"
-#include "DIO.h"
+#include "../../HAL/interrupt.h"
 
 
 #define BIT_0   0x01 	// defines BIT0 in a register
